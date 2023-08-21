@@ -27,7 +27,7 @@ func TestReadConfig(t *testing.T) {
 		} `mapstructure:"param"`
 	}{}
 	// c := &config.Config{}
-	err := ReadConfig("/Users/xiaodong/go/src/myproject/go-web-formwork/config/config_test.yaml", cfgPojo)
+	err := ReadConfig("config_test.yaml", cfgPojo)
 	if err != nil {
 		panic(err)
 	}
