@@ -37,4 +37,8 @@ func TestInitServerDB(t *testing.T) {
 	if userInfo != userTest {
 		t.Errorf("TestInitServerDB() = %v, tests %v", userInfo, userTest)
 	}
+	err = GetDB().Where("username", userInfo.Username).Delete(&userInfo).Error
+	if err != nil {
+		panic(err)
+	}
 }
