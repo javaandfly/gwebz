@@ -59,3 +59,37 @@ go get github.com/javaandfly/go-web-formwork
 	}
     ```
 - 还支持设置连接池的属性
+
+## Log
+
+- log初始化 
+    ```go
+    // 参数: filepath 
+    serverName := strings.Split(filepath.Base(os.Args[0]), ".")[0]
+	serverMark := GetSvrmark(serverName)
+    err := InitLog("test_log/", serverName, serverMark, func(str string) {})
+	if err != nil {
+		panic(err)
+	}
+    ```
+- 使用
+    - 用户等级
+     ```go
+        LogW("this is a log message %v",err)
+     ```
+    - Debug等级
+     ```go
+        LogD("this is a log message %v",err)
+     ```   
+    - 告警日志
+     ```go
+        LogError(err)
+     ``` 
+- 回调事件
+    - 可以设置回调事件 默认日志等级在 2 3 4 会触发
+    ```go
+    LogSetCallback(func(s string) {
+		LogW("回调函数被调用了")
+	})
+    ```
+- log的参数都是可以设计的
