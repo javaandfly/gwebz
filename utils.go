@@ -1,4 +1,4 @@
-package logz
+package gwebz
 
 import (
 	"fmt"
