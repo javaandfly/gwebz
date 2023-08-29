@@ -104,3 +104,14 @@ go get github.com/javaandfly/go-web-formwork
         使用RunContainerIOC的方式启动我们的程序，使用依赖注入的方式；
         第一个参数传入http监听类，后续参数可以传入初始化的方法
         详情可看方法注释 使用的是fx依赖反转框架
+
+
+## Redis
+ - 初始化
+    ```go
+    err := InitGlobalRedisClient("127.0.0.1:6379", "", "123456", 1)
+	if err != nil {
+    panic(err)
+	}
+    ```
+- 跟DB一样两种方式 一种全局 一种获取实例
