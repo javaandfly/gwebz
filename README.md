@@ -3,7 +3,7 @@
 
 ## 入门
 ```bash
-go get github.com/javaandfly/go-web-formwork
+go get github.com/javaandfly/gwebz
 ```
 ## Config
 - 首先你需要创建你的配置文件,当前支持的配置文件类型,
