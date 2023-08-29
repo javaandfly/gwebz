@@ -100,7 +100,7 @@ go get github.com/javaandfly/go-web-formwork
     ```go
        RunContainerIOC(httpClint,InitDB,Initlog...)
      ``` 
-     -- 使用说明
+     - 使用说明
         使用RunContainerIOC的方式启动我们的程序，使用依赖注入的方式；
         第一个参数传入http监听类，后续参数可以传入初始化的方法
         详情可看方法注释 使用的是fx依赖反转框架
