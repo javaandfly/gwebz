@@ -94,7 +94,7 @@ go get github.com/javaandfly/gwebz
     ```
 - log的参数都是可以设计的
 
-## IOC
+## IOC(目前不可用)
 
 - ioc初始化 
     ```go
@@ -115,3 +115,7 @@ go get github.com/javaandfly/gwebz
 	}
     ```
 - 跟DB一样两种方式 一种全局 一种获取实例
+
+## CLI(目前不可用)
+
+
