@@ -2,6 +2,7 @@ package gwebz
 
 import (
 	"errors"
+	"gwebz/internal/utils"
 	"os"
 	"path/filepath"
 	"strings"
@@ -10,7 +11,7 @@ import (
 
 func TestInitLog(t *testing.T) {
 	serverName := strings.Split(filepath.Base(os.Args[0]), ".")[0]
-	serverMark := GetSvrmark("sync" + serverName)
+	serverMark := utils.GetSvrmark("sync" + serverName)
 
 	err := InitLog("test_log/", serverName, serverMark, func(str string) {})
 	if err != nil {

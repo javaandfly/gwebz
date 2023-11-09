@@ -1,7 +1,8 @@
-package gwebz
+package ioc
 
 import (
 	"fmt"
+	"gwebz/internal/config"
 	"testing"
 
 	"go.uber.org/fx"
@@ -22,12 +23,12 @@ type Cfg struct {
 func TestIOC(t *testing.T) {
 	cfgPojo := &Cfg{}
 
-	err := ReadConfig("config_test.yaml", cfgPojo)
+	err := config.ReadConfig("config_test.yaml", cfgPojo)
 	if err != nil {
 		panic(err)
 	}
 	// RunContainerIOC(func() {}, NewHTTPServer, NewServer)
-	fx.New(fx.Provide(NewHTTPServer,)).Run()
+	fx.New(fx.Provide(NewHTTPServer)).Run()
 }
 
 func NewHTTPServer(cfg *Cfg) *HTTPServer {
