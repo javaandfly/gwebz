@@ -3,6 +3,7 @@ package gwebz
 import (
 	"bytes"
 	"fmt"
+	"gwebz/internal/utils"
 	"io"
 	"os"
 	"path"
@@ -225,7 +226,7 @@ func LogUid(uid uint64, format string, v ...interface{}) {
 		LogWrite(g_stdout, fmt.Sprintf("u%d", uid), format, v...)
 	}
 	//save to u_xxx.log
-	if InArray(uid, g_log.uids) {
+	if utils.InArray(uid, g_log.uids) {
 		var f *os.File
 		pf, loaded := g_log.ufmap.LoadOrStore(uid, &f)
 		// fmt.Printf("f=%v, loaded=%v \r\n", &f, loaded)
