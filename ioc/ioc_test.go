@@ -5,7 +5,7 @@ import (
 
 	"testing"
 
-	"github.com/javaandfly/gwebz/internal/config"
+	"github.com/javaandfly/gwebz/config"
 	"go.uber.org/fx"
 )
 

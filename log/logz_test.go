@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/javaandfly/gwebz/internal/utils"
+	"github.com/javaandfly/gwebz/utils"
 )
 
 func TestInitLog(t *testing.T) {

@@ -15,7 +15,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/javaandfly/gwebz/internal/utils"
+	"github.com/javaandfly/gwebz/utils"
 )
 
 /*

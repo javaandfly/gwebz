@@ -13,10 +13,6 @@ func DoCopyStack(a, b int) int {
 	return 0
 }
 
-func testFunc() {
-	DoCopyStack(0, 0)
-}
-
 func testPanicFunc() {
 	panic("test")
 }

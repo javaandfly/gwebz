@@ -24,8 +24,9 @@ func (router *RouterEngine) Router() error {
 	return nil
 }
 
-func (router *RouterEngine) Run() {
-	router.R.Run(router.port)
+func (router *RouterEngine) Run() error {
+	err := router.R.Run(router.port)
+	return err
 }
 func (router *RouterEngine) AddGlobalObj(middleware ...gin.HandlerFunc) {
 	router.mutex.Lock()
