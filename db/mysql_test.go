@@ -13,7 +13,7 @@ func TestInitServerDB(t *testing.T) {
 		Username: "xiaodong",
 		Password: "123456",
 	}
-	err := InitGlobalDB("mysql", "127.0.0.1", "3306", "test", "root", "123456", "utf8")
+	err := InitGlobalDB("mysql", "127.0.0.1", "3306", "test", "root", "123456", "utf8", true)
 	if err != nil {
 		panic(err)
 	}
