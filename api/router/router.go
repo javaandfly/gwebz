@@ -7,21 +7,9 @@ import (
 )
 
 type RouterEngine struct {
-	R          *gin.Engine
-	mutex      *sync.Mutex
-	port       string
-	middleware []gin.HandlerFunc
-}
-
-func (router *RouterEngine) Router() error {
-
-	router.R.RedirectTrailingSlash = false
-
-	for _, middleware := range router.middleware {
-		router.R.Use(middleware)
-	}
-
-	return nil
+	R     *gin.Engine
+	mutex *sync.Mutex
+	port  string
 }
 
 func (router *RouterEngine) Run() error {
@@ -31,7 +19,7 @@ func (router *RouterEngine) Run() error {
 func (router *RouterEngine) AddGlobalObj(middleware ...gin.HandlerFunc) {
 	router.mutex.Lock()
 	defer router.mutex.Unlock()
-	router.middleware = append(router.middleware, middleware...)
+	router.R.Use(middleware...)
 }
 
 func NewGinEngine(port string) *RouterEngine {
