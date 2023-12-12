@@ -1,12 +1,12 @@
 package request
 
 import (
-	"gwebz/internal/api/response"
 	"net/http"
 
 	"ccian.cc/Satori/journey-src/middleware"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
+	"github.com/javaandfly/gwebz/internal/api/response"
 )
 
 func ParseJsonProcess(context *gin.Context, req any) error {

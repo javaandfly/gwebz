@@ -2,9 +2,10 @@ package ioc
 
 import (
 	"fmt"
-	"gwebz/internal/config"
+
 	"testing"
 
+	"github.com/javaandfly/gwebz/internal/config"
 	"go.uber.org/fx"
 )
 

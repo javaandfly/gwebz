@@ -2,11 +2,13 @@ package log
 
 import (
 	"errors"
-	"gwebz/internal/utils"
+
 	"os"
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"github.com/javaandfly/gwebz/internal/utils"
 )
 
 func TestInitLog(t *testing.T) {

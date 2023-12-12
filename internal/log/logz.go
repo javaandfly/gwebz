@@ -3,7 +3,7 @@ package log
 import (
 	"bytes"
 	"fmt"
-	"gwebz/internal/utils"
+
 	"io"
 	"os"
 	"path"
@@ -14,6 +14,8 @@ import (
 	"sync"
 	"sync/atomic"
 	"time"
+
+	"github.com/javaandfly/gwebz/internal/utils"
 )
 
 /*

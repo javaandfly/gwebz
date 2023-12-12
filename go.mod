@@ -1,4 +1,4 @@
-module gwebz
+module github.com/javaandfly/gwebz
 
 go 1.20
 
