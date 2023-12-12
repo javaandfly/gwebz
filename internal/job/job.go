@@ -9,8 +9,10 @@ import (
 type HandlerTask func(context *JobContext)
 
 type JobEngine struct {
-	Context   *JobContext
-	Mutex     *sync.Mutex
+	Context *JobContext
+	mutex   *sync.Mutex
+	Wg      sync.WaitGroup
+
 	Timer     *time.Timer
 	AwaitTime time.Duration
 	Task      []HandlerTask
@@ -21,12 +23,14 @@ type JobContext struct {
 	ObjectMap map[string]any
 }
 
-func NewJobEngine(ctx context.Context, awaitTime, errorTime int) *JobEngine {
+func NewJobEngine(ctx context.Context, awaitTime int) *JobEngine {
 	timer := time.NewTimer(0)
 	awaitTimeout := time.Duration(awaitTime) * time.Second
 	// errotTimeout := time.Duration(errorTime) * time.Second
 	return &JobEngine{
 		Context:   &JobContext{ctx: ctx},
+		mutex:     &sync.Mutex{},
+		Wg:        sync.WaitGroup{},
 		Timer:     timer,
 		AwaitTime: awaitTimeout,
 	}
@@ -41,14 +45,22 @@ func (j *JobEngine) JobTimingHandle() {
 		case <-j.Timer.C: // wait for timer triggered
 		}
 		for _, fc := range j.Task {
-			fc(j.Context)
+			j.Wg.Add(1)
+			go func(fc HandlerTask) {
+				defer j.Wg.Done()
+				fc(j.Context)
+			}(fc)
 		}
+		j.Wg.Wait()
 		j.Timer.Reset(j.AwaitTime)
 
 	}
 }
 
 func (j *JobEngine) AddTask(tasks ...HandlerTask) {
+	j.mutex.Lock()
+	defer j.mutex.Unlock()
+
 	if tasks == nil {
 		j.Task = make([]HandlerTask, 0)
 	}
