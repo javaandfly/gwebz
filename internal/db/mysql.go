@@ -1,4 +1,4 @@
-package gwebz
+package db
 
 import (
 	"fmt"
