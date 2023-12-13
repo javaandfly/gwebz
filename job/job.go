@@ -17,6 +17,7 @@ type JobEngine struct {
 	AwaitTime  time.Duration
 	PrefixTask []HandlerTask
 	Task       []HandlerTask
+	EndTask    []HandlerTask
 }
 
 type JobContext struct {
@@ -56,9 +57,32 @@ func (j *JobEngine) JobTimingHandle() {
 			}(fc)
 		}
 		j.Wg.Wait()
+		for _, fc := range j.PrefixTask {
+			fc(j.Context)
+		}
 		j.Timer.Reset(j.AwaitTime)
 
 	}
+}
+
+func (j *JobEngine) AddPrefixTask(tasks ...HandlerTask) {
+	j.mutex.Lock()
+	defer j.mutex.Unlock()
+
+	if tasks == nil {
+		j.Task = make([]HandlerTask, 0)
+	}
+	j.PrefixTask = append(j.Task, tasks...)
+}
+
+func (j *JobEngine) AddEndTask(tasks ...HandlerTask) {
+	j.mutex.Lock()
+	defer j.mutex.Unlock()
+
+	if tasks == nil {
+		j.Task = make([]HandlerTask, 0)
+	}
+	j.EndTask = append(j.Task, tasks...)
 }
 
 func (j *JobEngine) AddTask(tasks ...HandlerTask) {
