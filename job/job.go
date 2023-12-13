@@ -13,9 +13,10 @@ type JobEngine struct {
 	mutex   *sync.Mutex
 	Wg      sync.WaitGroup
 
-	Timer     *time.Timer
-	AwaitTime time.Duration
-	Task      []HandlerTask
+	Timer      *time.Timer
+	AwaitTime  time.Duration
+	PrefixTask []HandlerTask
+	Task       []HandlerTask
 }
 
 type JobContext struct {
@@ -43,6 +44,9 @@ func (j *JobEngine) JobTimingHandle() {
 		case <-j.Context.ctx.Done():
 			return
 		case <-j.Timer.C: // wait for timer triggered
+		}
+		for _, fc := range j.PrefixTask {
+			fc(j.Context)
 		}
 		for _, fc := range j.Task {
 			j.Wg.Add(1)
