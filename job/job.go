@@ -8,6 +8,10 @@ import (
 
 type HandlerTask func(context *JobContext)
 
+type JobContextObj interface {
+	GetContextObject(context *JobContext)
+}
+
 type JobEngine struct {
 	Context *JobContext
 	mutex   *sync.Mutex
@@ -57,7 +61,7 @@ func (j *JobEngine) JobTimingHandle() {
 			}(fc)
 		}
 		j.Wg.Wait()
-		for _, fc := range j.PrefixTask {
+		for _, fc := range j.EndTask {
 			fc(j.Context)
 		}
 		j.Timer.Reset(j.AwaitTime)
