@@ -10,32 +10,34 @@ import (
 	"github.com/javaandfly/gwebz/api/response"
 )
 
-func ParseJsonProcess(context *gin.Context, req any) error {
+func ParseJsonProcess(context *gin.Context, req any) {
 	if err := context.ShouldBindWith(req, binding.JSON); err != nil {
 		context.JSON(http.StatusBadRequest, response.ErrParam)
-		return err
+		context.Abort()
+		return
 	}
 
 	// validate param
 	err := middleware.ValidateParam(context, req)
 	if err != nil {
 		context.JSON(http.StatusBadRequest, response.ErrParam)
-		return err
+		context.Abort()
+		return
 	}
-	return nil
 }
 
-func ParseFormProcess(context *gin.Context, req any) error {
+func ParseFormProcess(context *gin.Context, req any) {
 	if err := context.ShouldBindQuery(req); err != nil {
 		context.JSON(http.StatusBadRequest, response.ErrParam)
-		return err
+		context.Abort()
+		return
 	}
 
 	// validate param
 	if err := middleware.ValidateParam(context, req); err != nil {
 		context.JSON(http.StatusBadRequest, response.ErrParam)
-		return err
+		context.Abort()
+		return
 	}
-	return nil
 
 }
