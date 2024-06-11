@@ -8,20 +8,15 @@ import (
 
 type HandlerTask func(context *JobContext)
 
-type JobContextObj interface {
-	GetContextObject(context *JobContext)
-}
-
 type JobEngine struct {
 	Context *JobContext
 	mutex   *sync.Mutex
 	Wg      sync.WaitGroup
 
-	Timer      *time.Timer
-	AwaitTime  time.Duration
-	PrefixTask []HandlerTask
-	Task       []HandlerTask
-	EndTask    []HandlerTask
+	timer     *time.Timer
+	awaitTime time.Duration
+	batchTask []HandlerTask
+	task      []HandlerTask
 }
 
 type JobContext struct {
@@ -29,7 +24,7 @@ type JobContext struct {
 	ObjectMap map[string]any
 }
 
-func NewJobEngine(ctx context.Context, awaitTime int) *JobEngine {
+func NewJobEngine(ctx context.Context, awaitTime int, startMult bool) *JobEngine {
 	timer := time.NewTimer(0)
 	awaitTimeout := time.Duration(awaitTime) * time.Second
 	// errotTimeout := time.Duration(errorTime) * time.Second
@@ -37,8 +32,8 @@ func NewJobEngine(ctx context.Context, awaitTime int) *JobEngine {
 		Context:   &JobContext{ctx: ctx},
 		mutex:     &sync.Mutex{},
 		Wg:        sync.WaitGroup{},
-		Timer:     timer,
-		AwaitTime: awaitTimeout,
+		timer:     timer,
+		awaitTime: awaitTimeout,
 	}
 }
 
@@ -48,55 +43,47 @@ func (j *JobEngine) JobTimingHandle() {
 		select {
 		case <-j.Context.ctx.Done():
 			return
-		case <-j.Timer.C: // wait for timer triggered
+		case <-j.timer.C: // wait for timer triggered
 		}
-		for _, fc := range j.PrefixTask {
-			fc(j.Context)
-		}
-		for _, fc := range j.Task {
+
+		for _, fc := range j.batchTask {
 			j.Wg.Add(1)
 			go func(fc HandlerTask) {
 				defer j.Wg.Done()
 				fc(j.Context)
 			}(fc)
 		}
-		j.Wg.Wait()
-		for _, fc := range j.EndTask {
+
+		for _, fc := range j.task {
 			fc(j.Context)
 		}
-		j.Timer.Reset(j.AwaitTime)
+
+		j.Wg.Wait()
+
+		j.timer.Reset(j.awaitTime)
 
 	}
 }
 
-func (j *JobEngine) AddPrefixTask(tasks ...HandlerTask) {
+func (j *JobEngine) AddMultTask(tasks ...HandlerTask) {
+
 	j.mutex.Lock()
 	defer j.mutex.Unlock()
 
-	if tasks == nil {
-		j.Task = make([]HandlerTask, 0)
+	if j.batchTask == nil {
+		j.batchTask = make([]HandlerTask, 0)
 	}
-	j.PrefixTask = append(j.Task, tasks...)
-}
-
-func (j *JobEngine) AddEndTask(tasks ...HandlerTask) {
-	j.mutex.Lock()
-	defer j.mutex.Unlock()
-
-	if tasks == nil {
-		j.Task = make([]HandlerTask, 0)
-	}
-	j.EndTask = append(j.Task, tasks...)
+	j.batchTask = append(j.batchTask, tasks...)
 }
 
 func (j *JobEngine) AddTask(tasks ...HandlerTask) {
 	j.mutex.Lock()
 	defer j.mutex.Unlock()
 
-	if tasks == nil {
-		j.Task = make([]HandlerTask, 0)
+	if j.task == nil {
+		j.task = make([]HandlerTask, 0)
 	}
-	j.Task = append(j.Task, tasks...)
+	j.task = append(j.task, tasks...)
 }
 
 func (c *JobContext) SetContextMap(key string, value any) {
