@@ -48,19 +48,31 @@ func (j *JobEngine) JobTimingHandle() {
 		case <-j.timer.C: // wait for timer triggered
 		}
 
-		if j.isEnableManyGoroutine {
-			for _, fc := range j.batchTask {
-				j.Wg.Add(1)
-				go func(fc HandlerTask) {
-					defer j.Wg.Done()
+		doTask := func() {
+			j.Wg.Add(1)
+			go func() {
+				defer j.Wg.Done()
+				for _, fc := range j.task {
 					fc(j.Context)
-				}(fc)
-			}
-		} else {
-			for _, fc := range j.task {
-				fc(j.Context)
+				}
+
+			}()
+		}
+
+		doMultTask := func() {
+			if j.isEnableManyGoroutine {
+				for _, fc := range j.batchTask {
+					j.Wg.Add(1)
+					go func(fc HandlerTask) {
+						defer j.Wg.Done()
+						fc(j.Context)
+					}(fc)
+				}
 			}
 		}
+
+		doTask()
+		doMultTask()
 
 		j.Wg.Wait()
 
