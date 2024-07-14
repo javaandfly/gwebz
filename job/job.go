@@ -13,9 +13,10 @@ type JobContextObj interface {
 }
 
 type JobEngine struct {
-	Context *JobContext
-	mutex   *sync.Mutex
-	Wg      sync.WaitGroup
+	Context               *JobContext
+	mutex                 *sync.Mutex
+	Wg                    sync.WaitGroup
+	isEnableManyGoroutine bool
 
 	Timer      *time.Timer
 	AwaitTime  time.Duration
@@ -29,7 +30,7 @@ type JobContext struct {
 	ObjectMap map[string]any
 }
 
-func NewJobEngine(ctx context.Context, awaitTime int) *JobEngine {
+func NewJobEngine(ctx context.Context, awaitTime int, isEnableManyGoroutine bool) *JobEngine {
 	timer := time.NewTimer(0)
 	awaitTimeout := time.Duration(awaitTime) * time.Second
 	// errotTimeout := time.Duration(errorTime) * time.Second
@@ -53,13 +54,20 @@ func (j *JobEngine) JobTimingHandle() {
 		for _, fc := range j.PrefixTask {
 			fc(j.Context)
 		}
-		for _, fc := range j.Task {
-			j.Wg.Add(1)
-			go func(fc HandlerTask) {
-				defer j.Wg.Done()
+		if j.isEnableManyGoroutine {
+			for _, fc := range j.Task {
+				j.Wg.Add(1)
+				go func(fc HandlerTask) {
+					defer j.Wg.Done()
+					fc(j.Context)
+				}(fc)
+			}
+		} else {
+			for _, fc := range j.Task {
 				fc(j.Context)
-			}(fc)
+			}
 		}
+
 		j.Wg.Wait()
 		for _, fc := range j.EndTask {
 			fc(j.Context)

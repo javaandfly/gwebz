@@ -9,7 +9,7 @@ import (
 
 func TestJobEngine(t *testing.T) {
 	start := time.Now()
-	job := NewJobEngine(context.Background(), 10000000)
+	job := NewJobEngine(context.Background(), 10000000, false)
 	for i := 0; i < 10000; i++ {
 		job.AddTask(add)
 	}
