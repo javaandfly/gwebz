@@ -18,11 +18,10 @@ type JobEngine struct {
 	Wg                    sync.WaitGroup
 	isEnableManyGoroutine bool
 
-	Timer      *time.Timer
-	AwaitTime  time.Duration
-	PrefixTask []HandlerTask
-	Task       []HandlerTask
-	EndTask    []HandlerTask
+	Timer     *time.Timer
+	AwaitTime time.Duration
+	task      []HandlerTask
+	multTask  []HandlerTask
 }
 
 type JobContext struct {
@@ -51,60 +50,50 @@ func (j *JobEngine) JobTimingHandle() {
 			return
 		case <-j.Timer.C: // wait for timer triggered
 		}
-		for _, fc := range j.PrefixTask {
-			fc(j.Context)
-		}
 		if j.isEnableManyGoroutine {
-			for _, fc := range j.Task {
+			for _, fc := range j.multTask {
 				j.Wg.Add(1)
 				go func(fc HandlerTask) {
 					defer j.Wg.Done()
 					fc(j.Context)
 				}(fc)
 			}
+			j.Wg.Wait()
 		} else {
-			for _, fc := range j.Task {
+			for _, fc := range j.task {
 				fc(j.Context)
 			}
 		}
 
-		j.Wg.Wait()
-		for _, fc := range j.EndTask {
-			fc(j.Context)
-		}
 		j.Timer.Reset(j.AwaitTime)
 
 	}
-}
-
-func (j *JobEngine) AddPrefixTask(tasks ...HandlerTask) {
-	j.mutex.Lock()
-	defer j.mutex.Unlock()
-
-	if tasks == nil {
-		j.Task = make([]HandlerTask, 0)
-	}
-	j.PrefixTask = append(j.Task, tasks...)
-}
-
-func (j *JobEngine) AddEndTask(tasks ...HandlerTask) {
-	j.mutex.Lock()
-	defer j.mutex.Unlock()
-
-	if tasks == nil {
-		j.Task = make([]HandlerTask, 0)
-	}
-	j.EndTask = append(j.Task, tasks...)
 }
 
 func (j *JobEngine) AddTask(tasks ...HandlerTask) {
 	j.mutex.Lock()
 	defer j.mutex.Unlock()
 
-	if tasks == nil {
-		j.Task = make([]HandlerTask, 0)
+	if j.task == nil {
+		j.task = make([]HandlerTask, 0)
 	}
-	j.Task = append(j.Task, tasks...)
+	j.task = append(j.task, tasks...)
+}
+
+func (j *JobEngine) AddMultTask(tasks ...HandlerTask) {
+	j.mutex.Lock()
+	defer j.mutex.Unlock()
+
+	if j.multTask == nil {
+		j.task = make([]HandlerTask, 0)
+	}
+	j.multTask = append(j.multTask, tasks...)
+}
+
+func (j *JobEngine) Stop() {
+	j.mutex.Lock()
+	defer j.mutex.Unlock()
+	j.Context.ctx.Done()
 }
 
 func (c *JobContext) SetContextMap(key string, value any) {
